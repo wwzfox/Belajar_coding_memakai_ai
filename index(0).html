@@ -1,0 +1,3567 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport"  
+      content="width=device-width,  
+               initial-scale=1.0,  
+               maximum-scale=1.0,  
+               user-scalable=no">  <title>wwzfox & zenn.KJ</title>  <style>  
+*{  
+  box-sizing:border-box;  
+  -webkit-tap-highlight-color:transparent;  
+  user-select:none;  
+  -webkit-user-select:none;  
+}  
+  
+html,body{  
+  margin:0;  
+  width:100%;  
+  height:100%;  
+  overflow:hidden;  
+  background:#000;  
+  font-family:Arial,sans-serif;  
+  touch-action:none;  
+}  
+  
+canvas{  
+  position:fixed;  
+  inset:0;  
+  width:100%;  
+  height:100%;  
+  display:block;  
+  pointer-events:none;  
+}  
+  
+/* =========================================================  
+   CAMERA TOUCH AREA  
+========================================================= */  
+  
+#cameraTouch{  
+  position:fixed;  
+  inset:0;  
+  z-index:4;  
+  touch-action:none;  
+  pointer-events:auto;  
+}  
+  
+/* =========================================================  
+   UI  
+========================================================= */  
+  
+#gameUI{  
+  position:fixed;  
+  inset:0;  
+  z-index:6;  
+  pointer-events:none;  
+}  
+  
+button{  
+  border:none;  
+  color:white;  
+  background:rgba(20,20,25,.78);  
+  border:1px solid rgba(255,255,255,.2);  
+  border-radius:15px;  
+  padding:14px 20px;  
+  min-height:52px;  
+  font-size:15px;  
+  font-weight:bold;  
+  backdrop-filter:blur(8px);  
+  -webkit-backdrop-filter:blur(8px);  
+  pointer-events:auto;  
+}  
+  
+button:active{  
+  transform:scale(.94);  
+}  
+  
+/* =========================================================  
+   JOYSTICK  
+========================================================= */  
+  
+#joy{  
+  position:fixed;  
+  left:22px;  
+  bottom:25px;  
+  width:150px;  
+  height:150px;  
+  border-radius:50%;  
+  background:rgba(255,255,255,.12);  
+  border:2px solid rgba(255,255,255,.25);  
+  z-index:8;  
+  pointer-events:auto;  
+  touch-action:none;  
+}  
+  
+#stick{  
+  position:absolute;  
+  width:66px;  
+  height:66px;  
+  left:42px;  
+  top:42px;  
+  border-radius:50%;  
+  background:rgba(255,255,255,.35);  
+  border:2px solid rgba(255,255,255,.45);  
+  pointer-events:none;  
+}  
+  
+/* =========================================================  
+   PAUSE  
+========================================================= */  
+  
+#pauseBtn{  
+  position:fixed;  
+  right:18px;  
+  top:18px;  
+  z-index:9;  
+}  
+  
+/* =========================================================  
+   HINT  
+========================================================= */  
+  
+#touchHint{  
+  position:fixed;  
+  left:50%;  
+  bottom:18px;  
+  transform:translateX(-50%);  
+  z-index:7;  
+  
+  color:white;  
+  background:rgba(0,0,0,.38);  
+  padding:7px 12px;  
+  border-radius:12px;  
+  font-size:11px;  
+  opacity:.65;  
+  pointer-events:none;  
+}  
+  
+/* =========================================================  
+   MENU  
+========================================================= */  
+  
+.panel{  
+  position:fixed;  
+  left:50%;  
+  top:50%;  
+  transform:translate(-50%,-50%);  
+  
+  width:min(88vw,420px);  
+  max-height:88vh;  
+  overflow:auto;  
+  
+  background:rgba(10,12,18,.9);  
+  border:1px solid rgba(255,255,255,.16);  
+  border-radius:24px;  
+  
+  padding:25px;  
+  
+  color:white;  
+  text-align:center;  
+  
+  box-shadow:0 20px 70px rgba(0,0,0,.55);  
+  
+  z-index:20;  
+  pointer-events:auto;  
+}  
+  
+.panel h1{  
+  margin:0 0 10px;  
+  font-size:29px;  
+}  
+  
+.panel h2{  
+  margin:0 0 18px;  
+}  
+  
+.panel p{  
+  color:#ccc;  
+  line-height:1.5;  
+}  
+  
+.menuButton{  
+  width:100%;  
+  margin-top:12px;  
+}  
+  
+.settingRow{  
+  display:flex;  
+  align-items:center;  
+  justify-content:space-between;  
+  gap:15px;  
+  
+  margin:12px 0;  
+  padding:13px;  
+  
+  background:rgba(255,255,255,.06);  
+  border-radius:13px;  
+}  
+  
+.settingRow button{  
+  min-width:95px;  
+}  
+  
+.hidden{  
+  display:none!important;  
+}  
+  
+/* =========================================================  
+   TIMER  
+========================================================= */  
+  
+#timer{  
+  position:fixed;  
+  top:18px;  
+  left:50%;  
+  transform:translateX(-50%);  
+  
+  z-index:8;  
+  
+  padding:9px 17px;  
+  
+  color:white;  
+  background:rgba(0,0,0,.42);  
+  border-radius:15px;  
+  
+  font-size:16px;  
+  font-weight:bold;  
+  
+  pointer-events:none;  
+}  
+  
+/* =========================================================  
+   VICTORY  
+========================================================= */  
+  
+#victoryOverlay{  
+  position:fixed;  
+  inset:0;  
+  z-index:30;  
+  
+  display:flex;  
+  align-items:center;  
+  justify-content:center;  
+  
+  background:rgba(0,0,0,.65);  
+  
+  pointer-events:auto;  
+}  
+  
+.victoryBox{  
+  width:min(88vw,430px);  
+  padding:30px;  
+  
+  color:white;  
+  text-align:center;  
+  
+  border-radius:25px;  
+  background:rgba(15,18,25,.95);  
+  
+  border:1px solid rgba(255,215,80,.4);  
+  
+  box-shadow:  
+    0 0 50px rgba(255,200,40,.18),  
+    0 25px 80px rgba(0,0,0,.7);  
+}  
+  
+.victoryBox h1{  
+  margin:0 0 8px;  
+  font-size:31px;  
+  color:#ffd95a;  
+}  
+  
+.trophyText{  
+  font-size:65px;  
+  margin:12px 0;  
+}  
+  
+.rewardText{  
+  color:#ddd;  
+  line-height:1.5;  
+}  
+  
+/* =========================================================  
+   MOBILE  
+========================================================= */  
+  
+@media(max-width:600px){  
+  
+  #joy{  
+    width:158px;  
+    height:158px;  
+    left:18px;  
+    bottom:20px;  
+  }  
+  
+  #stick{  
+    width:70px;  
+    height:70px;  
+    left:42px;  
+    top:42px;  
+  }  
+  
+  #touchHint{  
+    bottom:185px;  
+    font-size:10px;  
+  }  
+  
+  .panel{  
+    padding:20px;  
+  }  
+  
+  .panel h1{  
+    font-size:25px;  
+  }  
+}  
+</style>  </head>  <body>  <div id="cameraTouch"></div>  <div id="gameUI">    <div id="timer">00:00</div>  <button id="pauseBtn">Ⅱ</button>
+
+  <div id="joy">  
+    <div id="stick"></div>  
+  </div>    <div id="touchHint">  
+    GESER = KAMERA • 2 JARI = ZOOM  
+  </div>  </div>  <!-- =======================================================  
+     MAIN MENU  
+======================================================= -->  <div id="menu" class="panel">    <h1>WWZFOX & ZENN.KJ</h1>    <p>  
+    Jelajahi dunia, ikuti jalan, lalu temukan pintu menuju  
+    labirin.  
+  </p>    <button id="playBtn" class="menuButton">  
+    PLAY  
+  </button>    <button id="settingsBtn" class="menuButton">  
+    SETTINGS  
+  </button>  </div>  <!-- =======================================================  
+     SETTINGS  
+======================================================= -->  <div id="settings" class="panel hidden">    <h2>SETTINGS</h2>    <div class="settingRow">  
+    <span>Music</span>  
+    <button id="musicBtn">ON</button>  
+  </div>    <div class="settingRow">  
+    <span>Timer</span>  
+    <button id="timerBtn">ON</button>  
+  </div>    <div class="settingRow">  
+    <span>Camera</span>  
+    <button id="cameraBtn">NORMAL</button>  
+  </div>    <button id="backSettings" class="menuButton">  
+    BACK  
+  </button>  </div>  <!-- =======================================================  
+     PAUSE  
+======================================================= -->  <div id="pausePanel" class="panel hidden">    <h2>PAUSED</h2>    <button id="resumeBtn" class="menuButton">  
+    RESUME  
+  </button>    <button id="restartBtn" class="menuButton">  
+    RESTART  
+  </button>    <button id="menuBtn" class="menuButton">  
+    MAIN MENU  
+  </button>  </div>  <!-- =======================================================  
+     VICTORY  
+======================================================= -->  <div id="victoryOverlay" class="hidden">    <div class="victoryBox">  <div class="trophyText">🏆</div>  
+
+<h1>MAZE CONQUEROR</h1>  
+
+<p class="rewardText">  
+  Kamu berhasil keluar dari labirin.  
+  <br><br>  
+  Sebagai hadiah, area rahasia telah terbuka.  
+  <br>  
+  Nikmati tempat ini dan lihat trofi kemenanganmu.  
+</p>  
+
+<button id="exploreBtn">  
+  EXPLORE REWARD  
+</button>
+
+  </div>  </div>  <script type="module">  
+  
+import * as THREE  
+from  
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";  
+  
+  
+/* =========================================================  
+   RENDERER  
+========================================================= */  
+  
+const renderer = new THREE.WebGLRenderer({  
+  antialias:true,  
+  powerPreference:"high-performance"  
+});  
+  
+renderer.setPixelRatio(  
+  Math.min(window.devicePixelRatio,1.6)  
+);  
+  
+renderer.setSize(  
+  innerWidth,  
+  innerHeight  
+);  
+  
+renderer.shadowMap.enabled=true;  
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;  
+  
+renderer.outputColorSpace=THREE.SRGBColorSpace;  
+  
+document.body.appendChild(renderer.domElement);  
+  
+  
+/* =========================================================  
+   SCENE  
+========================================================= */  
+  
+const scene=new THREE.Scene();  
+  
+scene.fog=new THREE.FogExp2(  
+  0xf3a8a0,  
+  0.0027  
+);  
+  
+  
+/* =========================================================  
+   CAMERA  
+========================================================= */  
+  
+const camera=new THREE.PerspectiveCamera(  
+  65,  
+  innerWidth/innerHeight,  
+  .1,  
+  1000  
+);  
+  
+  
+/* =========================================================  
+   LIGHTING  
+========================================================= */  
+  
+const hemi=new THREE.HemisphereLight(  
+  0xffd5c8,  
+  0x394f32,  
+  1.8  
+);  
+  
+scene.add(hemi);  
+  
+  
+const sun=new THREE.DirectionalLight(  
+  0xffc18e,  
+  3  
+);  
+  
+sun.position.set(  
+  -80,  
+  120,  
+  100  
+);  
+  
+sun.castShadow=true;  
+  
+sun.shadow.mapSize.width=1024;  
+sun.shadow.mapSize.height=1024;  
+  
+sun.shadow.camera.left=-180;  
+sun.shadow.camera.right=180;  
+sun.shadow.camera.top=180;  
+sun.shadow.camera.bottom=-180;  
+  
+scene.add(sun);  
+  
+  
+/* =========================================================  
+   SKY  
+========================================================= */  
+  
+const skyGeo=new THREE.SphereGeometry(  
+  500,  
+  32,  
+  16  
+);  
+  
+const skyMat=new THREE.MeshBasicMaterial({  
+  color:0xe99c99,  
+  side:THREE.BackSide  
+});  
+  
+const sky=new THREE.Mesh(  
+  skyGeo,  
+  skyMat  
+);  
+  
+scene.add(sky);  
+  
+  
+/* =========================================================  
+   WORLD GROUPS  
+========================================================= */  
+  
+const lobbyGroup=new THREE.Group();  
+const mazeGroup=new THREE.Group();  
+const victoryGroup=new THREE.Group();  
+  
+scene.add(lobbyGroup);  
+scene.add(mazeGroup);  
+scene.add(victoryGroup);  
+  
+  
+/* =========================================================  
+   WORLD STATE  
+========================================================= */  
+  
+let currentWorld="lobby";  
+  
+let gameStarted=false;  
+let paused=false;  
+let finished=false;  
+  
+let timerEnabled=true;  
+let musicEnabled=true;  
+  
+let timerStart=0;  
+let elapsed=0;  
+  
+let cameraSensitivity=.012;  
+  
+let cameraYaw=0;  
+let cameraPitch=.18;  
+let cameraDistance=8;  
+  
+const clock=new THREE.Clock();  
+  
+  
+/* =========================================================  
+   TERRAIN FUNCTION  
+========================================================= */  
+  
+function terrainY(x,z){  
+  
+  let y=0;  
+  
+  y += Math.sin(x*.035)*2.0;  
+  y += Math.cos(z*.045)*1.7;  
+  y += Math.sin((x+z)*.025)*2.1;  
+  y += Math.cos((x-z)*.018)*1.4;  
+  
+  const roadFlatten=Math.exp(  
+    -(x*x)/900  
+  );  
+  
+  y*=1-roadFlatten*.75;  
+  
+  return y;  
+}  
+  
+  
+/* =========================================================  
+   TERRAIN  
+========================================================= */  
+  
+const terrainSize=500;  
+const terrainSegments=100;  
+  
+const terrainGeo=new THREE.PlaneGeometry(  
+  terrainSize,  
+  terrainSize,  
+  terrainSegments,  
+  terrainSegments  
+);  
+  
+const terrainPos=terrainGeo.attributes.position;  
+  
+for(let i=0;i<terrainPos.count;i++){  
+  
+  const x=terrainPos.getX(i);  
+  const z=terrainPos.getY(i);  
+  
+  terrainPos.setZ(  
+    i,  
+    terrainY(x,-z)  
+  );  
+}  
+  
+terrainGeo.computeVertexNormals();  
+  
+const terrainMat=new THREE.MeshStandardMaterial({  
+  color:0x4c7c42,  
+  roughness:1  
+});  
+  
+const terrain=new THREE.Mesh(  
+  terrainGeo,  
+  terrainMat  
+);  
+  
+terrain.rotation.x=-Math.PI/2;  
+  
+terrain.receiveShadow=true;  
+  
+lobbyGroup.add(terrain);  
+  
+  
+/* =========================================================  
+   ROAD V2  
+   FLAT RIBBON — NO TUBE  
+========================================================= */  
+  
+function createRoad(){  
+  
+  const width=7;  
+  const start=-245;  
+  const end=245;  
+  const step=5;  
+  
+  const vertices=[];  
+  const indices=[];  
+  const uvs=[];  
+  
+  let row=0;  
+  
+  for(  
+    let z=start;  
+    z<=end;  
+    z+=step  
+  ){  
+  
+    const leftX=-width/2;  
+    const rightX=width/2;  
+  
+    const leftY=  
+      terrainY(leftX,z)+.13;  
+  
+    const rightY=  
+      terrainY(rightX,z)+.13;  
+  
+    vertices.push(  
+      leftX,leftY,z,  
+      rightX,rightY,z  
+    );  
+  
+    uvs.push(  
+      0,row*.04,  
+      1,row*.04  
+    );  
+  
+    if(row>0){  
+  
+      const a=(row-1)*2;  
+      const b=row*2;  
+  
+      indices.push(  
+        a,  
+        b,  
+        a+1,  
+  
+        a+1,  
+        b,  
+        b+1  
+      );  
+    }  
+  
+    row++;  
+  }  
+  
+  const geo=new THREE.BufferGeometry();  
+  
+  geo.setAttribute(  
+    "position",  
+    new THREE.Float32BufferAttribute(  
+      vertices,  
+      3  
+    )  
+  );  
+  
+  geo.setAttribute(  
+    "uv",  
+    new THREE.Float32BufferAttribute(  
+      uvs,  
+      2  
+    )  
+  );  
+  
+  geo.setIndex(indices);  
+  
+  geo.computeVertexNormals();  
+  
+  const mat=new THREE.MeshStandardMaterial({  
+    color:0x3e4144,  
+    roughness:.92  
+  });  
+  
+  const mesh=new THREE.Mesh(  
+    geo,  
+    mat  
+  );  
+  
+  mesh.receiveShadow=true;  
+  
+  lobbyGroup.add(mesh);  
+  
+  return mesh;  
+}  
+  
+createRoad();  
+  
+  
+/* =========================================================  
+   ROAD CENTER MARKERS  
+========================================================= */  
+  
+function createRoadMarkers(){  
+  
+  for(  
+    let z=-240;  
+    z<240;  
+    z+=12  
+  ){  
+  
+    const y=  
+      terrainY(0,z)+.19;  
+  
+    const geo=  
+      new THREE.BoxGeometry(  
+        .18,  
+        .025,  
+        5  
+      );  
+  
+    const mat=  
+      new THREE.MeshBasicMaterial({  
+        color:0xf4d27a  
+      });  
+  
+    const marker=  
+      new THREE.Mesh(  
+        geo,  
+        mat  
+      );  
+  
+    marker.position.set(  
+      0,  
+      y,  
+      z  
+    );  
+  
+    lobbyGroup.add(marker);  
+  }  
+}  
+  
+createRoadMarkers();  
+  
+  
+/* =========================================================  
+   LAKE  
+========================================================= */  
+  
+const lakeShape=new THREE.Shape();  
+  
+lakeShape.moveTo(-1,0);  
+  
+lakeShape.bezierCurveTo(  
+  35,-25,  
+  90,-10,  
+  120,20  
+);  
+  
+lakeShape.bezierCurveTo(  
+  90,60,  
+  35,75,  
+  -20,50  
+);  
+  
+lakeShape.bezierCurveTo(  
+  -55,30,  
+  -45,5,  
+  -1,0  
+);  
+  
+const lakeGeo=new THREE.ShapeGeometry(  
+  lakeShape  
+);  
+  
+const lakeMat=new THREE.MeshStandardMaterial({  
+  color:0x5d9fa8,  
+  transparent:true,  
+  opacity:.78,  
+  roughness:.15,  
+  metalness:.05  
+});  
+  
+const lake=new THREE.Mesh(  
+  lakeGeo,  
+  lakeMat  
+);  
+  
+lake.rotation.x=-Math.PI/2;  
+  
+lake.position.set(  
+  120,  
+  terrainY(120,30)+.08,  
+  30  
+);  
+  
+lobbyGroup.add(lake);  
+  
+  
+/* =========================================================  
+   TREE CREATOR  
+========================================================= */  
+  
+function createTree(  
+  x,  
+  z,  
+  scale=1  
+){  
+  
+  const group=new THREE.Group();  
+  
+  const y=terrainY(x,z);  
+  
+  group.position.set(  
+    x,  
+    y,  
+    z  
+  );  
+  
+  group.scale.setScalar(scale);  
+  
+  const trunk=new THREE.Mesh(  
+    new THREE.CylinderGeometry(  
+      .65,  
+      .95,  
+      6,  
+      8  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0x65452e  
+    })  
+  );  
+  
+  trunk.position.y=3;  
+  
+  trunk.castShadow=true;  
+  
+  group.add(trunk);  
+  
+  
+  for(let i=0;i<5;i++){  
+  
+    const crown=new THREE.Mesh(  
+      new THREE.IcosahedronGeometry(  
+        3.2,  
+        1  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x315f38,  
+        roughness:1  
+      })  
+    );  
+  
+    crown.position.set(  
+      (Math.random()-.5)*4,  
+      5.5+Math.random()*3,  
+      (Math.random()-.5)*4  
+    );  
+  
+    crown.castShadow=true;  
+  
+    group.add(crown);  
+  }  
+  
+  lobbyGroup.add(group);  
+}  
+  
+  
+/* =========================================================  
+   NORMAL TREES  
+========================================================= */  
+  
+for(let i=0;i<75;i++){  
+  
+  const x=  
+    (Math.random()-.5)*420;  
+  
+  const z=  
+    (Math.random()-.5)*440;  
+  
+  if(Math.abs(x)<12) continue;  
+  
+  createTree(  
+    x,  
+    z,  
+    .7+Math.random()*.7  
+  );  
+}  
+  
+  
+/* =========================================================  
+   GIANT TREE  
+========================================================= */  
+  
+function createGiantTree(){  
+  
+  const group=new THREE.Group();  
+  
+  const x=-115;  
+  const z=15;  
+  
+  group.position.set(  
+    x,  
+    terrainY(x,z),  
+    z  
+  );  
+  
+  const trunk=new THREE.Mesh(  
+    new THREE.CylinderGeometry(  
+      2.8,  
+      4,  
+      18,  
+      12  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0x573923  
+    })  
+  );  
+  
+  trunk.position.y=9;  
+  
+  trunk.castShadow=true;  
+  
+  group.add(trunk);  
+  
+  
+  for(let i=0;i<13;i++){  
+  
+    const crown=new THREE.Mesh(  
+      new THREE.IcosahedronGeometry(  
+        7,  
+        1  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x285536  
+      })  
+    );  
+  
+    crown.position.set(  
+      (Math.random()-.5)*12,  
+      17+Math.random()*11,  
+      (Math.random()-.5)*12  
+    );  
+  
+    crown.castShadow=true;  
+  
+    group.add(crown);  
+  }  
+  
+  lobbyGroup.add(group);  
+}  
+  
+createGiantTree();  
+  
+  
+/* =========================================================  
+   FLOWERS  
+========================================================= */  
+  
+function createFlower(x,z){  
+  
+  const y=terrainY(x,z);  
+  
+  const stem=new THREE.Mesh(  
+    new THREE.CylinderGeometry(  
+      .025,  
+      .025,  
+      .5,  
+      5  
+    ),  
+    new THREE.MeshBasicMaterial({  
+      color:0x356b36  
+    })  
+  );  
+  
+  stem.position.set(  
+    x,  
+    y+.25,  
+    z  
+  );  
+  
+  lobbyGroup.add(stem);  
+  
+  
+  const flower=new THREE.Mesh(  
+    new THREE.SphereGeometry(  
+      .12,  
+      6,  
+      6  
+    ),  
+    new THREE.MeshBasicMaterial({  
+      color:  
+        Math.random()>.5  
+        ?0xffd66b  
+        :0xff9eaf  
+    })  
+  );  
+  
+  flower.position.set(  
+    x,  
+    y+.52,  
+    z  
+  );  
+  
+  lobbyGroup.add(flower);  
+}  
+  
+for(let i=0;i<180;i++){  
+  
+  const x=  
+    (Math.random()-.5)*390;  
+  
+  const z=  
+    (Math.random()-.5)*430;  
+  
+  if(Math.abs(x)<10) continue;  
+  
+  createFlower(x,z);  
+}  
+  
+  
+/* =========================================================  
+   FALLING LEAVES  
+========================================================= */  
+  
+const leaves=[];  
+  
+for(let i=0;i<90;i++){  
+  
+  const leaf=new THREE.Mesh(  
+    new THREE.PlaneGeometry(  
+      .35,  
+      .65  
+    ),  
+    new THREE.MeshBasicMaterial({  
+      color:  
+        Math.random()>.5  
+        ?0xd99b48  
+        :0xb86c3e,  
+      side:THREE.DoubleSide,  
+      transparent:true  
+    })  
+  );  
+  
+  leaf.position.set(  
+    -115+(Math.random()-.5)*80,  
+    12+Math.random()*35,  
+    15+(Math.random()-.5)*80  
+  );  
+  
+  leaf.rotation.z=Math.random()*Math.PI;  
+  
+  lobbyGroup.add(leaf);  
+  
+  leaves.push({  
+    mesh:leaf,  
+    speed:.8+Math.random()*1.4,  
+    drift:.4+Math.random()*.7  
+  });  
+}  
+  
+  
+/* =========================================================  
+   HAMSTER PLAYER  
+========================================================= */  
+  
+function createHamster(){  
+  
+  const group=new THREE.Group();  
+  
+  const body=new THREE.Mesh(  
+    new THREE.SphereGeometry(  
+      1.05,  
+      16,  
+      12  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0xd8a16b  
+    })  
+  );  
+  
+  body.scale.y=1.12;  
+  
+  body.position.y=1.1;  
+  
+  body.castShadow=true;  
+  
+  group.add(body);  
+  
+  
+  const belly=new THREE.Mesh(  
+    new THREE.SphereGeometry(  
+      .7,  
+      14,  
+      10  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0xf0d2a4  
+    })  
+  );  
+  
+  belly.scale.set(  
+    .9,  
+    1,  
+    .4  
+  );  
+  
+  belly.position.set(  
+    0,  
+    1.05,  
+    .82  
+  );  
+  
+  group.add(belly);  
+  
+  
+  const head=new THREE.Mesh(  
+    new THREE.SphereGeometry(  
+      .75,  
+      16,  
+      12  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0xd8a16b  
+    })  
+  );  
+  
+  head.position.set(  
+    0,  
+    2.05,  
+    .05  
+  );  
+  
+  head.castShadow=true;  
+  
+  group.add(head);  
+  
+  
+  const earGeo=  
+    new THREE.SphereGeometry(  
+      .25,  
+      12,  
+      8  
+    );  
+  
+  
+  const ear1=new THREE.Mesh(  
+    earGeo,  
+    new THREE.MeshStandardMaterial({  
+      color:0xe7b487  
+    })  
+  );  
+  
+  ear1.position.set(  
+    -.58,  
+    2.42,  
+    0  
+  );  
+  
+  group.add(ear1);  
+  
+  
+  const ear2=ear1.clone();  
+  
+  ear2.position.x=.58;  
+  
+  group.add(ear2);  
+  
+  
+  const eyeMat=  
+    new THREE.MeshBasicMaterial({  
+      color:0x111111  
+    });  
+  
+  
+  const eye1=new THREE.Mesh(  
+    new THREE.SphereGeometry(  
+      .075,  
+      8,  
+      8  
+    ),  
+    eyeMat  
+  );  
+  
+  eye1.position.set(  
+    -.27,  
+    2.15,  
+    .66  
+  );  
+  
+  group.add(eye1);  
+  
+  
+  const eye2=eye1.clone();  
+  
+  eye2.position.x=.27;  
+  
+  group.add(eye2);  
+  
+  
+  for(const x of [-.55,.55]){  
+  
+    const foot=new THREE.Mesh(  
+      new THREE.SphereGeometry(  
+        .25,  
+        10,  
+        8  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0xc18757  
+      })  
+    );  
+  
+    foot.position.set(  
+      x,  
+      .45,  
+      .2  
+    );  
+  
+    group.add(foot);  
+  }  
+  
+  
+  return group;  
+}  
+  
+const player=createHamster();  
+  
+scene.add(player);  
+  
+  
+/* =========================================================  
+   PLAYER STATE  
+========================================================= */  
+  
+player.position.set(  
+  0,  
+  terrainY(0,-220),  
+  -220  
+);  
+  
+let playerSpeed=7;  
+  
+  
+/* =========================================================  
+   JOYSTICK  
+========================================================= */  
+  
+const joy=document.getElementById("joy");  
+const stick=document.getElementById("stick");  
+  
+let joystickActive=false;  
+let joystickPointer=null;  
+  
+let joyX=0;  
+let joyY=0;  
+  
+function updateJoystick(  
+  clientX,  
+  clientY  
+){  
+  
+  const rect=  
+    joy.getBoundingClientRect();  
+  
+  const centerX=  
+    rect.left+rect.width/2;  
+  
+  const centerY=  
+    rect.top+rect.height/2;  
+  
+  let dx=  
+    clientX-centerX;  
+  
+  let dy=  
+    clientY-centerY;  
+  
+  const max=  
+    rect.width*.32;  
+  
+  const len=Math.hypot(  
+    dx,  
+    dy  
+  );  
+  
+  if(len>max){  
+  
+    dx=dx/len*max;  
+    dy=dy/len*max;  
+  }  
+  
+  joyX=dx/max;  
+  joyY=dy/max;  
+  
+  stick.style.transform=  
+    `translate(${dx}px,${dy}px)`;  
+}  
+  
+  
+joy.addEventListener(  
+  "pointerdown",  
+  e=>{  
+  
+    e.preventDefault();  
+  
+    joystickActive=true;  
+    joystickPointer=e.pointerId;  
+  
+    joy.setPointerCapture(  
+      e.pointerId  
+    );  
+  
+    updateJoystick(  
+      e.clientX,  
+      e.clientY  
+    );  
+  }  
+);  
+  
+  
+joy.addEventListener(  
+  "pointermove",  
+  e=>{  
+  
+    if(  
+      !joystickActive ||  
+      e.pointerId!==joystickPointer  
+    ) return;  
+  
+    e.preventDefault();  
+  
+    updateJoystick(  
+      e.clientX,  
+      e.clientY  
+    );  
+  }  
+);  
+  
+  
+function releaseJoystick(){  
+  
+  joystickActive=false;  
+  joystickPointer=null;  
+  
+  joyX=0;  
+  joyY=0;  
+  
+  stick.style.transform=  
+    "translate(0px,0px)";  
+}  
+  
+  
+joy.addEventListener(  
+  "pointerup",  
+  releaseJoystick  
+);  
+  
+joy.addEventListener(  
+  "pointercancel",  
+  releaseJoystick  
+);  
+  
+  
+/* =========================================================  
+   CAMERA TOUCH V2  
+========================================================= */  
+  
+const cameraTouch=  
+  document.getElementById(  
+    "cameraTouch"  
+  );  
+  
+let cameraPointer=null;  
+  
+let lastX=0;  
+let lastY=0;  
+  
+const activeTouches=  
+  new Map();  
+  
+let pinchStartDistance=0;  
+let pinchStartZoom=8;  
+  
+  
+/* distance between two fingers */  
+  
+function touchDistance(){  
+  
+  const points=[  
+    ...activeTouches.values()  
+  ];  
+  
+  if(points.length<2)  
+    return 0;  
+  
+  return Math.hypot(  
+    points[0].x-points[1].x,  
+    points[0].y-points[1].y  
+  );  
+}  
+  
+  
+cameraTouch.addEventListener(  
+  "pointerdown",  
+  e=>{  
+  
+    e.preventDefault();  
+  
+    activeTouches.set(  
+      e.pointerId,  
+      {  
+        x:e.clientX,  
+        y:e.clientY  
+      }  
+    );  
+  
+    cameraTouch.setPointerCapture(  
+      e.pointerId  
+    );  
+  
+  
+    /* FIRST FINGER */  
+  
+    if(activeTouches.size===1){  
+  
+      cameraPointer=e.pointerId;  
+  
+      lastX=e.clientX;  
+      lastY=e.clientY;  
+  
+      return;  
+    }  
+  
+  
+    /* SECOND FINGER */  
+  
+    if(activeTouches.size===2){  
+  
+      cameraPointer=null;  
+  
+      pinchStartDistance=  
+        touchDistance();  
+  
+      pinchStartZoom=  
+        cameraDistance;  
+    }  
+  
+  },  
+  {passive:false}  
+);  
+  
+  
+cameraTouch.addEventListener(  
+  "pointermove",  
+  e=>{  
+  
+    e.preventDefault();  
+  
+    if(  
+      !activeTouches.has(  
+        e.pointerId  
+      )  
+    ) return;  
+  
+  
+    activeTouches.set(  
+      e.pointerId,  
+      {  
+        x:e.clientX,  
+        y:e.clientY  
+      }  
+    );  
+  
+  
+    /* PINCH */  
+  
+    if(activeTouches.size>=2){  
+  
+      const distance=  
+        touchDistance();  
+  
+      /*  
+        Jari mendekat:  
+        distance mengecil  
+        cameraDistance bertambah  
+        = zoom OUT  
+  
+        Jari menjauh:  
+        distance membesar  
+        cameraDistance berkurang  
+        = zoom IN  
+      */  
+  
+      cameraDistance=  
+        THREE.MathUtils.clamp(  
+          pinchStartZoom+  
+          (  
+            pinchStartDistance-  
+            distance  
+          )*.025,  
+  
+          3.5,  
+          18  
+        );  
+  
+      return;  
+    }  
+  
+  
+    /* ONE FINGER CAMERA */  
+  
+    if(  
+      e.pointerId===  
+      cameraPointer  
+    ){  
+  
+      const dx=  
+        e.clientX-lastX;  
+  
+      const dy=  
+        e.clientY-lastY;  
+  
+  
+      cameraYaw+=  
+        dx*cameraSensitivity;  
+  
+      cameraPitch=  
+        THREE.MathUtils.clamp(  
+          cameraPitch+  
+          dy*cameraSensitivity,  
+  
+          -.55,  
+          .8  
+        );  
+  
+  
+      lastX=e.clientX;  
+      lastY=e.clientY;  
+    }  
+  
+  },  
+  {passive:false}  
+);  
+  
+  
+function endCameraPointer(e){  
+  
+  activeTouches.delete(  
+    e.pointerId  
+  );  
+  
+  
+  if(  
+    activeTouches.size===1  
+  ){  
+  
+    const entry=  
+      [...activeTouches.entries()][0];  
+  
+    cameraPointer=  
+      entry[0];  
+  
+    lastX=entry[1].x;  
+    lastY=entry[1].y;  
+  
+  }else{  
+  
+    cameraPointer=null;  
+  }  
+}  
+  
+  
+cameraTouch.addEventListener(  
+  "pointerup",  
+  endCameraPointer  
+);  
+  
+cameraTouch.addEventListener(  
+  "pointercancel",  
+  endCameraPointer  
+);  
+  
+  
+/* =========================================================  
+   CAMERA  
+========================================================= */  
+  
+function updateCamera(){  
+  
+  const target=  
+    new THREE.Vector3(  
+      player.position.x,  
+      player.position.y+2.1,  
+      player.position.z  
+    );  
+  
+  
+  const horizontal=  
+    Math.cos(cameraPitch)*  
+    cameraDistance;  
+  
+  
+  const desired=  
+    new THREE.Vector3(  
+  
+      target.x+  
+      Math.sin(cameraYaw)*  
+      horizontal,  
+  
+      target.y+  
+      Math.sin(cameraPitch)*  
+      cameraDistance,  
+  
+      target.z+  
+      Math.cos(cameraYaw)*  
+      horizontal  
+    );  
+  
+  
+  if(currentWorld==="lobby"){  
+  
+    const ground=  
+      terrainY(  
+        desired.x,  
+        desired.z  
+      )+1.2;  
+  
+    if(desired.y<ground)  
+      desired.y=ground;  
+  
+  }else{  
+  
+    if(desired.y<1)  
+      desired.y=1;  
+  }  
+  
+  
+  camera.position.lerp(  
+    desired,  
+    .16  
+  );  
+  
+  camera.lookAt(target);  
+}  
+  
+  
+/* =========================================================  
+   COLLISION HELPERS  
+========================================================= */  
+  
+function circleBoxCollision(  
+  x,  
+  z,  
+  box,  
+  radius  
+){  
+  
+  const closestX=  
+    THREE.MathUtils.clamp(  
+      x,  
+      box.min.x,  
+      box.max.x  
+    );  
+  
+  const closestZ=  
+    THREE.MathUtils.clamp(  
+      z,  
+      box.min.z,  
+      box.max.z  
+    );  
+  
+  const dx=x-closestX;  
+  const dz=z-closestZ;  
+  
+  return (  
+    dx*dx+  
+    dz*dz  
+  ) <  
+  radius*radius;  
+}  
+  
+  
+/* =========================================================  
+   MAZE  
+========================================================= */  
+  
+const mazeSize=31;  
+const cellSize=5;  
+  
+const mazeWalls=[];  
+  
+let mazeGrid=[];  
+  
+  
+/* =========================================================  
+   MAZE GENERATION  
+========================================================= */  
+  
+function generateMaze(){  
+  
+  mazeGrid=  
+    Array.from(  
+      {  
+        length:mazeSize  
+      },  
+      ()=>Array(  
+        mazeSize  
+      ).fill(1)  
+    );  
+  
+  
+  const stack=[];  
+  
+  const startX=1;  
+  const startZ=1;  
+  
+  mazeGrid[startZ][startX]=0;  
+  
+  stack.push({  
+    x:startX,  
+    z:startZ  
+  });  
+  
+  
+  const dirs=[  
+    {x:2,z:0},  
+    {x:-2,z:0},  
+    {x:0,z:2},  
+    {x:0,z:-2}  
+  ];  
+  
+  
+  while(stack.length){  
+  
+    const current=  
+      stack[stack.length-1];  
+  
+    const possible=[];  
+  
+  
+    for(const d of dirs){  
+  
+      const nx=  
+        current.x+d.x;  
+  
+      const nz=  
+        current.z+d.z;  
+  
+  
+      if(  
+        nx>0 &&  
+        nx<mazeSize-1 &&  
+        nz>0 &&  
+        nz<mazeSize-1 &&  
+        mazeGrid[nz][nx]===1  
+      ){  
+  
+        possible.push({  
+          x:nx,  
+          z:nz,  
+          dx:d.x/2,  
+          dz:d.z/2  
+        });  
+      }  
+    }  
+  
+  
+    if(possible.length===0){  
+  
+      stack.pop();  
+      continue;  
+    }  
+  
+  
+    const next=  
+      possible[  
+        Math.floor(  
+          Math.random()*  
+          possible.length  
+        )  
+      ];  
+  
+  
+    mazeGrid[  
+      next.z  
+    ][  
+      next.x  
+    ]=0;  
+  
+  
+    mazeGrid[  
+      current.z+  
+      next.dz  
+    ][  
+      current.x+  
+      next.dx  
+    ]=0;  
+  
+  
+    stack.push({  
+      x:next.x,  
+      z:next.z  
+    });  
+  }  
+  
+  
+  /* create entrance */  
+  
+  mazeGrid[1][0]=0;  
+  
+  /* create exit */  
+  
+  mazeGrid[  
+    mazeSize-2  
+  ][  
+    mazeSize-1  
+  ]=0;  
+}  
+  
+  
+/* =========================================================  
+   BRICK TEXTURE  
+========================================================= */  
+  
+function createBrickTexture(){  
+  
+  const c=  
+    document.createElement(  
+      "canvas"  
+    );  
+  
+  c.width=256;  
+  c.height=128;  
+  
+  const ctx=  
+    c.getContext("2d");  
+  
+  
+  ctx.fillStyle="#eeeeee";  
+  
+  ctx.fillRect(  
+    0,  
+    0,  
+    256,  
+    128  
+  );  
+  
+  
+  ctx.strokeStyle="#b8b8b8";  
+  
+  ctx.lineWidth=4;  
+  
+  
+  const brickH=32;  
+  const brickW=64;  
+  
+  
+  for(  
+    let y=0;  
+    y<128;  
+    y+=brickH  
+  ){  
+  
+    const offset=  
+      (y/brickH)%2  
+      ?brickW/2  
+      :0;  
+  
+  
+    for(  
+      let x=-brickW;  
+      x<256+brickW;  
+      x+=brickW  
+    ){  
+  
+      ctx.strokeRect(  
+        x+offset,  
+        y,  
+        brickW,  
+        brickH  
+      );  
+    }  
+  }  
+  
+  
+  const tex=  
+    new THREE.CanvasTexture(c);  
+  
+  tex.wrapS=  
+    THREE.RepeatWrapping;  
+  
+  tex.wrapT=  
+    THREE.RepeatWrapping;  
+  
+  tex.repeat.set(  
+    1.2,  
+    1  
+  );  
+  
+  tex.colorSpace=  
+    THREE.SRGBColorSpace;  
+  
+  return tex;  
+}  
+  
+  
+const brickTexture=  
+  createBrickTexture();  
+  
+  
+/* =========================================================  
+   BUILD MAZE  
+========================================================= */  
+  
+function buildMaze(){  
+  
+  generateMaze();  
+  
+  
+  while(  
+    mazeGroup.children.length  
+  ){  
+  
+    mazeGroup.remove(  
+      mazeGroup.children[0]  
+    );  
+  }  
+  
+  
+  mazeWalls.length=0;  
+  
+  
+  const wallMat=  
+    new THREE.MeshStandardMaterial({  
+      map:brickTexture,  
+      roughness:.9  
+    });  
+  
+  
+  const floorSize=  
+    mazeSize*cellSize;  
+  
+  
+  const floor=  
+    new THREE.Mesh(  
+      new THREE.BoxGeometry(  
+        floorSize,  
+        .3,  
+        floorSize  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x555555,  
+        roughness:1  
+      })  
+    );  
+  
+  
+  floor.position.y=-.15;  
+  
+  floor.receiveShadow=true;  
+  
+  mazeGroup.add(floor);  
+  
+  
+  const wallHeight=4;  
+  
+  
+  for(  
+    let z=0;  
+    z<mazeSize;  
+    z++  
+  ){  
+  
+    for(  
+      let x=0;  
+      x<mazeSize;  
+      x++  
+    ){  
+  
+      if(  
+        mazeGrid[z][x]!==1  
+      ) continue;  
+  
+  
+      const px=  
+        (  
+          x-  
+          mazeSize/2+  
+          .5  
+        )*cellSize;  
+  
+  
+      const pz=  
+        (  
+          z-  
+          mazeSize/2+  
+          .5  
+        )*cellSize;  
+  
+  
+      const wall=  
+        new THREE.Mesh(  
+          new THREE.BoxGeometry(  
+            cellSize,  
+            wallHeight,  
+            cellSize  
+          ),  
+          wallMat  
+        );  
+  
+  
+      wall.position.set(  
+        px,  
+        wallHeight/2,  
+        pz  
+      );  
+  
+  
+      wall.castShadow=true;  
+      wall.receiveShadow=true;  
+  
+      mazeGroup.add(wall);  
+  
+      mazeWalls.push(  
+        new THREE.Box3().setFromObject(  
+          wall  
+        )  
+      );  
+    }  
+  }  
+  
+  
+  createMazeExit();  
+}  
+  
+  
+/* =========================================================  
+   MAZE EXIT  
+========================================================= */  
+  
+let mazeExit;  
+  
+  
+function createMazeExit(){  
+  
+  mazeExit=  
+    new THREE.Group();  
+  
+  
+  const x=  
+    (  
+      mazeSize-1-  
+      mazeSize/2+  
+      .5  
+    )*cellSize;  
+  
+  
+  const z=  
+    (  
+      mazeSize-2-  
+      mazeSize/2+  
+      .5  
+    )*cellSize;  
+  
+  
+  mazeExit.position.set(  
+    x,  
+    0,  
+    z  
+  );  
+  
+  
+  const glow=  
+    new THREE.Mesh(  
+      new THREE.BoxGeometry(  
+        4,  
+        4,  
+        .5  
+      ),  
+      new THREE.MeshBasicMaterial({  
+        color:0x66ff99,  
+        transparent:true,  
+        opacity:.45  
+      })  
+    );  
+  
+  
+  glow.position.y=2;  
+  
+  mazeExit.add(glow);  
+  
+  
+  const frameMat=  
+    new THREE.MeshStandardMaterial({  
+      color:0x263c2c,  
+      metalness:.4,  
+      roughness:.35  
+    });  
+  
+  
+  const left=  
+    new THREE.Mesh(  
+      new THREE.BoxGeometry(  
+        .45,  
+        4.5,  
+        .55  
+      ),  
+      frameMat  
+    );  
+  
+  left.position.set(  
+    -2,  
+    2.25,  
+    0  
+  );  
+  
+  
+  const right=  
+    left.clone();  
+  
+  right.position.x=2;  
+  
+  
+  const top=  
+    new THREE.Mesh(  
+      new THREE.BoxGeometry(  
+        4.45,  
+        .45,  
+        .55  
+      ),  
+      frameMat  
+    );  
+  
+  top.position.y=4.25;  
+  
+  
+  mazeExit.add(  
+    left,  
+    right,  
+    top  
+  );  
+  
+  
+  mazeGroup.add(  
+    mazeExit  
+  );  
+}  
+  
+  
+/* =========================================================  
+   MAZE START  
+========================================================= */  
+  
+function mazeStartPosition(){  
+  
+  const x=  
+    (  
+      1-  
+      mazeSize/2+  
+      .5  
+    )*cellSize;  
+  
+  
+  const z=  
+    (  
+      1-  
+      mazeSize/2+  
+      .5  
+    )*cellSize;  
+  
+  
+  return {  
+    x,  
+    z  
+  };  
+}  
+  
+  
+/* =========================================================  
+   VICTORY AREA  
+========================================================= */  
+  
+let trophy;  
+  
+  
+function buildVictory(){  
+  
+  while(  
+    victoryGroup.children.length  
+  ){  
+  
+    victoryGroup.remove(  
+      victoryGroup.children[0]  
+    );  
+  }  
+  
+  
+  /* platform */  
+  
+  const platform=  
+    new THREE.Mesh(  
+      new THREE.CylinderGeometry(  
+        10,  
+        12,  
+        1.2,  
+        48  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x4a3d5d,  
+        metalness:.35,  
+        roughness:.5  
+      })  
+    );  
+  
+  
+  platform.position.y=-.6;  
+  
+  platform.receiveShadow=true;  
+  
+  victoryGroup.add(platform);  
+  
+  
+  /* glowing ring */  
+  
+  const ring=  
+    new THREE.Mesh(  
+      new THREE.TorusGeometry(  
+        8,  
+        .18,  
+        12,  
+        64  
+      ),  
+      new THREE.MeshBasicMaterial({  
+        color:0xffd75a  
+      })  
+    );  
+  
+  
+  ring.rotation.x=Math.PI/2;  
+  
+  ring.position.y=.05;  
+  
+  victoryGroup.add(ring);  
+  
+  
+  /* trophy */  
+  
+  trophy=new THREE.Group();  
+  
+  
+  const gold=  
+    new THREE.MeshStandardMaterial({  
+      color:0xffc928,  
+      metalness:.75,  
+      roughness:.22  
+    });  
+  
+  
+  const cup=  
+    new THREE.Mesh(  
+      new THREE.CylinderGeometry(  
+        1.7,  
+        1.15,  
+        2.4,  
+        24  
+      ),  
+      gold  
+    );  
+  
+  
+  cup.position.y=2.7;  
+  
+  trophy.add(cup);  
+  
+  
+  const stem=  
+    new THREE.Mesh(  
+      new THREE.CylinderGeometry(  
+        .3,  
+        .3,  
+        1.2,  
+        16  
+      ),  
+      gold  
+    );  
+  
+  
+  stem.position.y=1.25;  
+  
+  trophy.add(stem);  
+  
+  
+  const base=  
+    new THREE.Mesh(  
+      new THREE.CylinderGeometry(  
+        1.2,  
+        1.4,  
+        .5,  
+        20  
+      ),  
+      gold  
+    );  
+  
+  
+  base.position.y=.55;  
+  
+  trophy.add(base);  
+  
+  
+  const handleGeo=  
+    new THREE.TorusGeometry(  
+      1,  
+      .22,  
+      10,  
+      24,  
+      Math.PI  
+    );  
+  
+  
+  const h1=  
+    new THREE.Mesh(  
+      handleGeo,  
+      gold  
+    );  
+  
+  h1.rotation.z=Math.PI/2;  
+  
+  h1.position.set(  
+    -1.55,  
+    2.8,  
+    0  
+  );  
+  
+  trophy.add(h1);  
+  
+  
+  const h2=h1.clone();  
+  
+  h2.position.x=1.55;  
+  
+  h2.rotation.z=-Math.PI/2;  
+  
+  trophy.add(h2);  
+  
+  
+  trophy.position.set(  
+    0,  
+    0,  
+    8  
+  );  
+  
+  
+  trophy.scale.setScalar(  
+    1.2  
+  );  
+  
+  
+  victoryGroup.add(trophy);  
+  
+  
+  /* reward trees */  
+  
+  for(let i=0;i<18;i++){  
+  
+    const angle=  
+      Math.random()*  
+      Math.PI*2;  
+  
+    const r=  
+      14+  
+      Math.random()*12;  
+  
+    createRewardTree(  
+      Math.cos(angle)*r,  
+      Math.sin(angle)*r  
+    );  
+  }  
+  
+  
+  /* floating particles */  
+  
+  for(let i=0;i<45;i++){  
+  
+    const p=  
+      new THREE.Mesh(  
+        new THREE.SphereGeometry(  
+          .08,  
+          6,  
+          6  
+        ),  
+        new THREE.MeshBasicMaterial({  
+          color:0xffdf76  
+        })  
+      );  
+  
+  
+    p.position.set(  
+      (Math.random()-.5)*35,  
+      Math.random()*18,  
+      (Math.random()-.5)*35  
+    );  
+  
+  
+    victoryGroup.add(p);  
+  }  
+}  
+  
+  
+function createRewardTree(x,z){  
+  
+  const group=  
+    new THREE.Group();  
+  
+  
+  const trunk=  
+    new THREE.Mesh(  
+      new THREE.CylinderGeometry(  
+        .35,  
+        .5,  
+        3,  
+        8  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x65452e  
+      })  
+    );  
+  
+  
+  trunk.position.y=1.5;  
+  
+  group.add(trunk);  
+  
+  
+  const crown=  
+    new THREE.Mesh(  
+      new THREE.IcosahedronGeometry(  
+        2.5,  
+        1  
+      ),  
+      new THREE.MeshStandardMaterial({  
+        color:0x477a4c  
+      })  
+    );  
+  
+  
+  crown.position.y=4;  
+  
+  group.add(crown);  
+  
+  
+  group.position.set(  
+    x,  
+    0,  
+    z  
+  );  
+  
+  
+  victoryGroup.add(group);  
+}  
+  
+  
+buildMaze();  
+buildVictory();  
+  
+  
+/* =========================================================  
+   DOOR FROM LOBBY  
+========================================================= */  
+  
+const lobbyDoor=  
+  new THREE.Group();  
+  
+  
+lobbyDoor.position.set(  
+  0,  
+  terrainY(0,-190),  
+  -190  
+);  
+  
+  
+const doorFrame=  
+  new THREE.Mesh(  
+    new THREE.BoxGeometry(  
+      5,  
+      5,  
+      .7  
+    ),  
+    new THREE.MeshStandardMaterial({  
+      color:0x2e3439,  
+      metalness:.35,  
+      roughness:.45  
+    })  
+  );  
+  
+  
+doorFrame.position.y=2.5;  
+  
+lobbyDoor.add(  
+  doorFrame  
+);  
+  
+  
+const doorGlow=  
+  new THREE.Mesh(  
+    new THREE.PlaneGeometry(  
+      3.8,  
+      4  
+    ),  
+    new THREE.MeshBasicMaterial({  
+      color:0x65b9ff,  
+      transparent:true,  
+      opacity:.55,  
+      side:THREE.DoubleSide  
+    })  
+  );  
+  
+  
+doorGlow.position.set(  
+  0,  
+  2.2,  
+  .4  
+);  
+  
+  
+lobbyDoor.add(  
+  doorGlow  
+);  
+  
+  
+lobbyGroup.add(  
+  lobbyDoor  
+);  
+  
+  
+/* =========================================================  
+   WORLD VISIBILITY  
+========================================================= */  
+  
+function updateWorldVisibility(){  
+  
+  lobbyGroup.visible=  
+    currentWorld==="lobby";  
+  
+  mazeGroup.visible=  
+    currentWorld==="maze";  
+  
+  victoryGroup.visible=  
+    currentWorld==="victory";  
+}  
+  
+  
+/* =========================================================  
+   SWITCH WORLD  
+========================================================= */  
+  
+function switchWorld(world){  
+  
+  currentWorld=world;  
+  
+  if(world==="lobby"){  
+  
+    player.position.set(  
+      0,  
+      terrainY(0,-220),  
+      -220  
+    );  
+  
+    player.rotation.y=0;  
+  
+  }  
+  
+  
+  if(world==="maze"){  
+  
+    const p=  
+      mazeStartPosition();  
+  
+    player.position.set(  
+      p.x,  
+      0,  
+      p.z  
+    );  
+  
+    player.rotation.y=0;  
+  
+  }  
+  
+  
+  if(world==="victory"){  
+  
+    /*  
+      Spawn sedikit jauh dari trofi  
+      supaya tidak muncul di dalamnya.  
+    */  
+  
+    player.position.set(  
+      0,  
+      0,  
+      18  
+    );  
+  
+    player.rotation.y=Math.PI;  
+  
+  }  
+  
+  
+  updateWorldVisibility();  
+  
+  cameraYaw=0;  
+  cameraPitch=.18;  
+  cameraDistance=8;  
+}  
+  
+  
+/* =========================================================  
+   LOBBY MOVEMENT  
+========================================================= */  
+  
+function moveLobby(dt){  
+  
+  let mx=joyX;  
+  let mz=joyY;  
+  
+  if(  
+    Math.abs(mx)<.05 &&  
+    Math.abs(mz)<.05  
+  ) return;  
+  
+  
+  const len=Math.hypot(  
+    mx,  
+    mz  
+  );  
+  
+  
+  if(len>1){  
+  
+    mx/=len;  
+    mz/=len;  
+  }  
+  
+  
+  const forward=  
+    new THREE.Vector3(  
+      -Math.sin(cameraYaw),  
+      0,  
+      -Math.cos(cameraYaw)  
+    );  
+  
+  
+  const right=  
+    new THREE.Vector3(  
+      Math.cos(cameraYaw),  
+      0,  
+      -Math.sin(cameraYaw)  
+    );  
+  
+  
+  const direction=  
+    new THREE.Vector3();  
+  
+  
+  direction.addScaledVector(  
+    right,  
+    mx  
+  );  
+  
+  direction.addScaledVector(  
+    forward,  
+    -mz  
+  );  
+  
+  
+  if(direction.lengthSq()>0)  
+    direction.normalize();  
+  
+  
+  const speed=  
+    playerSpeed*dt;  
+  
+  
+  player.position.x+=  
+    direction.x*speed;  
+  
+  player.position.z+=  
+    direction.z*speed;  
+  
+  
+  const limit=245;  
+  
+  player.position.x=  
+    THREE.MathUtils.clamp(  
+      player.position.x,  
+      -limit,  
+      limit  
+    );  
+  
+  player.position.z=  
+    THREE.MathUtils.clamp(  
+      player.position.z,  
+      -limit,  
+      limit  
+    );  
+  
+  
+  player.position.y=  
+    terrainY(  
+      player.position.x,  
+      player.position.z  
+    );  
+  
+  
+  if(direction.lengthSq()>0){  
+  
+    const targetRotation=  
+      Math.atan2(  
+        direction.x,  
+        direction.z  
+      );  
+  
+    player.rotation.y=  
+      THREE.MathUtils.lerp(  
+        player.rotation.y,  
+        targetRotation,  
+        .18  
+      );  
+  }  
+}  
+  
+  
+/* =========================================================  
+   MAZE MOVEMENT  
+========================================================= */  
+  
+function moveMaze(dt){  
+  
+  let mx=joyX;  
+  let mz=joyY;  
+  
+  
+  const len=Math.hypot(  
+    mx,  
+    mz  
+  );  
+  
+  
+  if(len<.05)  
+    return;  
+  
+  
+  if(len>1){  
+  
+    mx/=len;  
+    mz/=len;  
+  }  
+  
+  
+  const forward=  
+    new THREE.Vector3(  
+      -Math.sin(cameraYaw),  
+      0,  
+      -Math.cos(cameraYaw)  
+    );  
+  
+  
+  const right=  
+    new THREE.Vector3(  
+      Math.cos(cameraYaw),  
+      0,  
+      -Math.sin(cameraYaw)  
+    );  
+  
+  
+  const direction=  
+    new THREE.Vector3();  
+  
+  
+  direction.addScaledVector(  
+    right,  
+    mx  
+  );  
+  
+  
+  direction.addScaledVector(  
+    forward,  
+    -mz  
+  );  
+  
+  
+  if(direction.lengthSq()>0)  
+    direction.normalize();  
+  
+  
+  const move=  
+    direction.multiplyScalar(  
+      playerSpeed*dt  
+    );  
+  
+  
+  const radius=1.05;  
+  
+  
+  const nextX=  
+    player.position.x+  
+    move.x;  
+  
+  
+  const nextZ=  
+    player.position.z+  
+    move.z;  
+  
+  
+  let blockedX=false;  
+  let blockedZ=false;  
+  
+  
+  for(  
+    const box of mazeWalls  
+  ){  
+  
+    if(  
+      circleBoxCollision(  
+        nextX,  
+        player.position.z,  
+        box,  
+        radius  
+      )  
+    ){  
+  
+      blockedX=true;  
+      break;  
+    }  
+  }  
+  
+  
+  if(!blockedX)  
+    player.position.x=nextX;  
+  
+  
+  for(  
+    const box of mazeWalls  
+  ){  
+  
+    if(  
+      circleBoxCollision(  
+        player.position.x,  
+        nextZ,  
+        box,  
+        radius  
+      )  
+    ){  
+  
+      blockedZ=true;  
+      break;  
+    }  
+  }  
+  
+  
+  if(!blockedZ)  
+    player.position.z=nextZ;  
+  
+  
+  if(direction.lengthSq()>0){  
+  
+    const targetRotation=  
+      Math.atan2(  
+        direction.x,  
+        direction.z  
+      );  
+  
+  
+    player.rotation.y=  
+      THREE.MathUtils.lerp(  
+        player.rotation.y,  
+        targetRotation,  
+        .18  
+      );  
+  }  
+  
+  
+  player.position.y=0;  
+}  
+  
+  
+/* =========================================================  
+   TELEPORT CHECK  
+========================================================= */  
+  
+function checkTeleport(){  
+  
+  if(  
+    currentWorld==="lobby"  
+  ){  
+  
+    if(  
+      player.position.distanceTo(  
+        lobbyDoor.position  
+      )<5  
+    ){  
+  
+      switchWorld(  
+        "maze"  
+      );  
+    }  
+  }  
+  
+  
+  if(  
+    currentWorld==="maze" &&  
+    mazeExit  
+  ){  
+  
+    if(  
+      player.position.distanceTo(  
+        mazeExit.position  
+      )<5  
+    ){  
+  
+      finished=true;  
+  
+      switchWorld(  
+        "victory"  
+      );  
+  
+      showVictory();  
+    }  
+  }  
+}  
+  
+  
+/* =========================================================  
+   VICTORY UI  
+========================================================= */  
+  
+const victoryOverlay=  
+  document.getElementById(  
+    "victoryOverlay"  
+  );  
+  
+  
+function showVictory(){  
+  
+  paused=true;  
+  
+  victoryOverlay.classList.remove(  
+    "hidden"  
+  );  
+}  
+  
+  
+document.getElementById(  
+  "exploreBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    victoryOverlay.classList.add(  
+      "hidden"  
+    );  
+  
+    paused=false;  
+  
+    finished=false;  
+  }  
+);  
+  
+  
+/* =========================================================  
+   TIMER  
+========================================================= */  
+  
+const timerElement=  
+  document.getElementById(  
+    "timer"  
+  );  
+  
+  
+function updateTimer(){  
+  
+  if(  
+    !timerEnabled ||  
+    !gameStarted ||  
+    paused  
+  ) return;  
+  
+  
+  elapsed=  
+    (performance.now()-  
+     timerStart)/1000;  
+  
+  
+  const minutes=  
+    Math.floor(  
+      elapsed/60  
+    );  
+  
+  const seconds=  
+    Math.floor(  
+      elapsed%60  
+    );  
+  
+  
+  timerElement.textContent=  
+    String(minutes).padStart(2,"0")  
+    +":"+  
+    String(seconds).padStart(2,"0");  
+  
+  
+  timerElement.classList.toggle(  
+    "hidden",  
+    !timerEnabled  
+  );  
+}  
+  
+  
+/* =========================================================  
+   LEAVES UPDATE  
+========================================================= */  
+  
+function updateLeaves(dt){  
+  
+  for(  
+    const leaf of leaves  
+  ){  
+  
+    leaf.mesh.position.y-=  
+      leaf.speed*dt;  
+  
+    leaf.mesh.position.x+=  
+      Math.sin(  
+        performance.now()*.001+  
+        leaf.mesh.position.z  
+      )*.25*dt;  
+  
+  
+    leaf.mesh.position.z+=  
+      leaf.drift*dt;  
+  
+  
+    leaf.mesh.rotation.x+=  
+      dt*1.4;  
+  
+    leaf.mesh.rotation.z+=  
+      dt*.8;  
+  
+  
+    if(  
+      leaf.mesh.position.y<.3  
+    ){  
+  
+      leaf.mesh.position.y=  
+        25+  
+        Math.random()*15;  
+  
+      leaf.mesh.position.x=  
+        -115+  
+        (Math.random()-.5)*80;  
+  
+      leaf.mesh.position.z=  
+        15+  
+        (Math.random()-.5)*80;  
+    }  
+  }  
+}  
+  
+  
+/* =========================================================  
+   TROPHY ANIMATION  
+========================================================= */  
+  
+function updateTrophy(){  
+  
+  if(!trophy)  
+    return;  
+  
+  
+  trophy.rotation.y+=  
+    .006;  
+  
+  
+  trophy.position.y=  
+    Math.sin(  
+      performance.now()*.002  
+    )*.15;  
+}  
+  
+  
+/* =========================================================  
+   UI  
+========================================================= */  
+  
+const menu=  
+  document.getElementById(  
+    "menu"  
+  );  
+  
+const settings=  
+  document.getElementById(  
+    "settings"  
+  );  
+  
+const pausePanel=  
+  document.getElementById(  
+    "pausePanel"  
+  );  
+  
+  
+const pauseBtn=  
+  document.getElementById(  
+    "pauseBtn"  
+  );  
+  
+  
+document.getElementById(  
+  "playBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    menu.classList.add(  
+      "hidden"  
+    );  
+  
+    gameStarted=true;  
+    paused=false;  
+    finished=false;  
+  
+    timerStart=  
+      performance.now();  
+  
+    elapsed=0;  
+  
+    switchWorld(  
+      "lobby"  
+    );  
+  }  
+);  
+  
+  
+document.getElementById(  
+  "settingsBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    menu.classList.add(  
+      "hidden"  
+    );  
+  
+    settings.classList.remove(  
+      "hidden"  
+    );  
+  }  
+);  
+  
+  
+document.getElementById(  
+  "backSettings"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    settings.classList.add(  
+      "hidden"  
+    );  
+  
+    menu.classList.remove(  
+      "hidden"  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   MUSIC  
+========================================================= */  
+  
+let audioContext=null;  
+let musicOsc=null;  
+let musicGain=null;  
+  
+  
+function startMusic(){  
+  
+  if(  
+    !musicEnabled ||  
+    musicOsc  
+  ) return;  
+  
+  
+  try{  
+  
+    audioContext=  
+      new (  
+        window.AudioContext ||  
+        window.webkitAudioContext  
+      )();  
+  
+  
+    musicOsc=  
+      audioContext.createOscillator();  
+  
+    musicGain=  
+      audioContext.createGain();  
+  
+  
+    musicOsc.type="sine";  
+  
+    musicOsc.frequency.value=220;  
+  
+    musicGain.gain.value=.025;  
+  
+  
+    musicOsc.connect(  
+      musicGain  
+    );  
+  
+    musicGain.connect(  
+      audioContext.destination  
+    );  
+  
+  
+    musicOsc.start();  
+  
+  }catch(e){}  
+}  
+  
+  
+function stopMusic(){  
+  
+  if(!musicOsc)  
+    return;  
+  
+  
+  try{  
+    musicOsc.stop();  
+  }catch(e){}  
+  
+  
+  musicOsc=null;  
+  
+  if(audioContext){  
+  
+    audioContext.close()  
+      .catch(()=>{});  
+  }  
+  
+  audioContext=null;  
+}  
+  
+  
+document.getElementById(  
+  "musicBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    musicEnabled=  
+      !musicEnabled;  
+  
+  
+    document.getElementById(  
+      "musicBtn"  
+    ).textContent=  
+      musicEnabled  
+      ?"ON"  
+      :"OFF";  
+  
+  
+    if(musicEnabled)  
+      startMusic();  
+    else  
+      stopMusic();  
+  }  
+);  
+  
+  
+/* =========================================================  
+   TIMER SETTING  
+========================================================= */  
+  
+const timerBtn=  
+  document.getElementById(  
+    "timerBtn"  
+  );  
+  
+  
+timerBtn.addEventListener(  
+  "click",  
+  ()=>{  
+  
+    timerEnabled=  
+      !timerEnabled;  
+  
+    timerBtn.textContent=  
+      timerEnabled  
+      ?"ON"  
+      :"OFF";  
+  
+  
+    timerElement.classList.toggle(  
+      "hidden",  
+      !timerEnabled  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   CAMERA SENSITIVITY  
+========================================================= */  
+  
+const cameraBtn=  
+  document.getElementById(  
+    "cameraBtn"  
+  );  
+  
+  
+cameraBtn.addEventListener(  
+  "click",  
+  ()=>{  
+  
+    if(  
+      cameraSensitivity===.012  
+    ){  
+  
+      cameraSensitivity=.018;  
+  
+      cameraBtn.textContent=  
+        "HIGH";  
+  
+    }else{  
+  
+      cameraSensitivity=.012;  
+  
+      cameraBtn.textContent=  
+        "NORMAL";  
+    }  
+  }  
+);  
+  
+  
+/* =========================================================  
+   PAUSE  
+========================================================= */  
+  
+pauseBtn.addEventListener(  
+  "click",  
+  ()=>{  
+  
+    if(!gameStarted)  
+      return;  
+  
+    paused=true;  
+  
+    pausePanel.classList.remove(  
+      "hidden"  
+    );  
+  }  
+);  
+  
+  
+document.getElementById(  
+  "resumeBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    paused=false;  
+  
+    pausePanel.classList.add(  
+      "hidden"  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   RESTART  
+========================================================= */  
+  
+document.getElementById(  
+  "restartBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    mazeGroup.visible=true;  
+  
+    buildMaze();  
+  
+    finished=false;  
+  
+    paused=false;  
+  
+    pausePanel.classList.add(  
+      "hidden"  
+    );  
+  
+    victoryOverlay.classList.add(  
+      "hidden"  
+    );  
+  
+    timerStart=  
+      performance.now();  
+  
+    elapsed=0;  
+  
+    switchWorld(  
+      "lobby"  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   MAIN MENU  
+========================================================= */  
+  
+document.getElementById(  
+  "menuBtn"  
+).addEventListener(  
+  "click",  
+  ()=>{  
+  
+    paused=false;  
+    gameStarted=false;  
+    finished=false;  
+  
+    pausePanel.classList.add(  
+      "hidden"  
+    );  
+  
+    victoryOverlay.classList.add(  
+      "hidden"  
+    );  
+  
+    settings.classList.add(  
+      "hidden"  
+    );  
+  
+    menu.classList.remove(  
+      "hidden"  
+    );  
+  
+    switchWorld(  
+      "lobby"  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   START MUSIC ON FIRST INTERACTION  
+========================================================= */  
+  
+document.addEventListener(  
+  "pointerdown",  
+  ()=>{  
+    if(  
+      gameStarted &&  
+      musicEnabled  
+    ){  
+  
+      startMusic();  
+    }  
+  },  
+  {  
+    once:false  
+  }  
+);  
+  
+  
+/* =========================================================  
+   RESIZE  
+========================================================= */  
+  
+window.addEventListener(  
+  "resize",  
+  ()=>{  
+  
+    camera.aspect=  
+      innerWidth/innerHeight;  
+  
+    camera.updateProjectionMatrix();  
+  
+    renderer.setSize(  
+      innerWidth,  
+      innerHeight  
+    );  
+  }  
+);  
+  
+  
+/* =========================================================  
+   INITIAL WORLD  
+========================================================= */  
+  
+updateWorldVisibility();  
+  
+timerElement.classList.add(  
+  "hidden"  
+);  
+  
+pauseBtn.classList.remove(  
+  "hidden"  
+);  
+  
+  
+/* =========================================================  
+   ANIMATION LOOP  
+========================================================= */  
+  
+function animate(){  
+  
+  requestAnimationFrame(  
+    animate  
+  );  
+  
+  
+  const dt=  
+    Math.min(  
+      clock.getDelta(),  
+      .05  
+    );  
+  
+  
+  if(  
+    gameStarted &&  
+    !paused  
+  ){  
+  
+    if(  
+      currentWorld==="lobby"  
+    ){  
+  
+      moveLobby(dt);  
+  
+    }else if(  
+      currentWorld==="maze"  
+    ){  
+  
+      moveMaze(dt);  
+    }  
+  
+  
+    checkTeleport();  
+  
+    updateLeaves(dt);  
+  
+    updateTrophy();  
+  
+    updateTimer();  
+  }  
+  
+  
+  updateCamera();  
+  
+  
+  renderer.render(  
+    scene,  
+    camera  
+  );  
+}  
+  
+  
+animate();  
+  
+</script>  </body>  
+</html>
